@@ -98,7 +98,7 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (!user) return undefined;
     
-    const updatedUser = { ...user, ...updates };
+    const updatedUser = { ...user, ...updates } as User;
     this.users.set(id, updatedUser);
     return updatedUser;
   }
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
 
   async addHealthMetric(metric: InsertHealthMetric): Promise<HealthMetric> {
     const id = randomUUID();
-    const healthMetric: HealthMetric = { ...metric, id };
+    const healthMetric: HealthMetric = { ...metric, id, metadata: metric.metadata || null };
     this.healthMetrics.set(id, healthMetric);
     return healthMetric;
   }
@@ -156,7 +156,7 @@ export class MemStorage implements IStorage {
 
   async addMoodAnalysis(analysis: InsertMoodAnalysis): Promise<MoodAnalysis> {
     const id = randomUUID();
-    const moodAnalysis: MoodAnalysis = { ...analysis, id, timestamp: new Date() };
+    const moodAnalysis: MoodAnalysis = { ...analysis, id, timestamp: new Date(), healthDataSnapshot: analysis.healthDataSnapshot || null };
     this.moodAnalyses.set(id, moodAnalysis);
     return moodAnalysis;
   }
@@ -170,7 +170,7 @@ export class MemStorage implements IStorage {
 
   async addMusicRecommendation(recommendation: InsertMusicRecommendation): Promise<MusicRecommendation> {
     const id = randomUUID();
-    const musicRecommendation: MusicRecommendation = { ...recommendation, id, timestamp: new Date() };
+    const musicRecommendation: MusicRecommendation = { ...recommendation, id, timestamp: new Date(), audioFeatures: recommendation.audioFeatures || null };
     this.musicRecommendations.set(id, musicRecommendation);
     return musicRecommendation;
   }
@@ -197,7 +197,7 @@ export class MemStorage implements IStorage {
 
   async addConnectedDevice(device: InsertConnectedDevice): Promise<ConnectedDevice> {
     const id = randomUUID();
-    const connectedDevice: ConnectedDevice = { ...device, id };
+    const connectedDevice: ConnectedDevice = { ...device, id, status: device.status || "disconnected", metadata: device.metadata || null, lastSync: device.lastSync || null, batteryLevel: device.batteryLevel || null };
     this.connectedDevices.set(id, connectedDevice);
     return connectedDevice;
   }
