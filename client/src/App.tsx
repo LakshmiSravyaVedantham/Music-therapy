@@ -9,6 +9,10 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeroSection } from "@/components/HeroSection";
 import { Dashboard } from "@/components/Dashboard";
+import { HealthPage } from "@/pages/HealthPage";
+import { MoodPage } from "@/pages/MoodPage";
+import { MusicPage } from "@/pages/MusicPage";
+import { DevicesPage } from "@/pages/DevicesPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,26 +26,10 @@ function Router() {
           </div>
         </div>
       )} />
-      <Route path="/health" component={() => (
-        <div className="p-6">
-          <Dashboard />
-        </div>
-      )} />
-      <Route path="/mood" component={() => (
-        <div className="p-6">
-          <Dashboard />
-        </div>
-      )} />
-      <Route path="/music" component={() => (
-        <div className="p-6">
-          <Dashboard />
-        </div>
-      )} />
-      <Route path="/devices" component={() => (
-        <div className="p-6">
-          <Dashboard />
-        </div>
-      )} />
+      <Route path="/health" component={HealthPage} />
+      <Route path="/mood" component={MoodPage} />
+      <Route path="/music" component={MusicPage} />
+      <Route path="/devices" component={DevicesPage} />
       <Route path="/settings" component={() => (
         <div className="p-6">
           <h1 className="text-3xl font-bold mb-6">Settings</h1>
