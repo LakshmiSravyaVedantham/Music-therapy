@@ -1,14 +1,17 @@
 import { MoodAnalysisCard } from "@/components/MoodAnalysisCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, TrendingUp, Sparkles, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { Brain, TrendingUp, Sparkles, RefreshCw, Music, Play } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { autoMusicService } from "@/services/autoMusicService";
 
 export function MoodPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+  const [currentAutoTrack, setCurrentAutoTrack] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -22,14 +25,21 @@ export function MoodPage() {
     queryKey: ['/api/mood/analysis'],
   });
 
-  // Mutation for analyzing mood
+  // Mutation for analyzing mood with auto-play
   const analyzeMoodMutation = useMutation({
-    mutationFn: () => apiRequest('/api/mood/analyze', 'POST'),
+    mutationFn: () => autoPlayEnabled ? 
+      autoMusicService.analyzeAndPlay() : 
+      apiRequest('/api/mood/analyze', 'POST'),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/mood/analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/music/recommendations'] });
+      
+      const analysis = (data as any).analysis || data;
       toast({
         title: "Mood Analysis Complete",
-        description: `Detected mood: ${data.analysis.mood} (${data.analysis.confidence}% confidence)`,
+        description: autoPlayEnabled ? 
+          `Detected ${analysis.mood} mood - Auto-playing music!` :
+          `Detected mood: ${analysis.mood} (${analysis.confidence}% confidence)`,
       });
       setIsAnalyzing(false);
     },
@@ -42,6 +52,47 @@ export function MoodPage() {
       setIsAnalyzing(false);
     }
   });
+
+  // Listen for auto-play events
+  useEffect(() => {
+    const handleAutoPlay = (event: any) => {
+      setCurrentAutoTrack(event.detail.track);
+      toast({
+        title: "🎵 Auto-Playing Music",
+        description: `${event.detail.track.trackName} - ${event.detail.track.moodMatch}% mood match`,
+      });
+    };
+
+    window.addEventListener('autoMusicPlay', handleAutoPlay);
+    
+    // Get current auto-play config
+    setAutoPlayEnabled(autoMusicService.getConfig().enabled);
+    setCurrentAutoTrack(autoMusicService.getCurrentTrack());
+
+    return () => {
+      window.removeEventListener('autoMusicPlay', handleAutoPlay);
+    };
+  }, []);
+
+  const toggleAutoPlay = () => {
+    const newEnabled = !autoPlayEnabled;
+    setAutoPlayEnabled(newEnabled);
+    autoMusicService.updateConfig({ enabled: newEnabled });
+    
+    if (newEnabled) {
+      toast({
+        title: "Auto-Play Enabled",
+        description: "Music will automatically play based on your mood analysis",
+      });
+    } else {
+      toast({
+        title: "Auto-Play Disabled", 
+        description: "You can manually control music playback",
+      });
+      autoMusicService.stopPlayback();
+      setCurrentAutoTrack(null);
+    }
+  };
 
   const handleAnalyzeMood = () => {
     setIsAnalyzing(true);
@@ -84,17 +135,66 @@ export function MoodPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Mood Analysis</h1>
-          <p className="text-muted-foreground">AI-powered insights into your emotional well-being</p>
+          <p className="text-muted-foreground">AI-powered insights with automatic music therapy</p>
         </div>
-        <Button 
-          onClick={handleAnalyzeMood}
-          disabled={isAnalyzing}
-          data-testid="button-analyze-mood"
-        >
-          <Brain className={`h-4 w-4 mr-2 ${isAnalyzing ? 'animate-pulse' : ''}`} />
-          {isAnalyzing ? 'Analyzing...' : 'Analyze Current Mood'}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={toggleAutoPlay}
+            className={autoPlayEnabled ? "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800" : ""}
+            data-testid="button-toggle-autoplay"
+          >
+            <Music className="h-4 w-4 mr-2" />
+            Auto-Play {autoPlayEnabled ? 'ON' : 'OFF'}
+          </Button>
+          <Button 
+            onClick={handleAnalyzeMood}
+            disabled={isAnalyzing}
+            data-testid="button-analyze-mood"
+          >
+            <Brain className={`h-4 w-4 mr-2 ${isAnalyzing ? 'animate-pulse' : ''}`} />
+            {isAnalyzing ? 'Analyzing...' : autoPlayEnabled ? 'Analyze & Play Music' : 'Analyze Mood'}
+          </Button>
+        </div>
       </div>
+
+      {/* Auto-Playing Track */}
+      {currentAutoTrack && autoPlayEnabled && (
+        <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900">
+                <Play className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              Auto-Playing Based on Your Mood
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-semibold text-green-800 dark:text-green-200">
+                  {currentAutoTrack.trackName}
+                </h3>
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  by {currentAutoTrack.artistName}
+                </p>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  {currentAutoTrack.moodMatch}% mood match
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-700 dark:text-green-300">Playing</span>
+                </div>
+              </div>
+              <p className="text-xs text-green-600 dark:text-green-400">
+                {currentAutoTrack.reason}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Current Mood Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
