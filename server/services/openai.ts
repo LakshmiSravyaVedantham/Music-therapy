@@ -87,7 +87,15 @@ Respond only with valid JSON, no additional text.`;
     }
 
     // Parse and validate the response
-    const result = JSON.parse(response) as MoodAnalysisResult;
+    let result: MoodAnalysisResult;
+    try {
+      // Remove any potential non-JSON preamble
+      const cleanResponse = response.trim().replace(/^[^{]*/, '');
+      result = JSON.parse(cleanResponse) as MoodAnalysisResult;
+    } catch (parseError) {
+      console.error("Failed to parse OpenAI response:", response);
+      throw new Error("Invalid JSON response from OpenAI");
+    }
     
     // Basic validation
     if (!result.mood || !result.confidence || !result.factors || !result.description || !result.recommendations) {

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { analyzeMoodFromHealthData } from "./services/openai";
 import { getRecommendationsBasedOnMood } from "./services/spotify";
+import { HealthDataSimulator } from "./services/healthSimulator";
 import { insertHealthMetricSchema, insertMoodAnalysisSchema, insertUserInteractionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -22,6 +23,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
     });
+    
+    // Initialize health data simulator for demo
+    const healthSimulator = new HealthDataSimulator(demoUser.id);
+    await healthSimulator.startSimulation();
   }
 
   // Health metrics endpoints
