@@ -32,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health metrics endpoints
   app.get("/api/health/metrics", async (req, res) => {
     try {
-      const metrics = await storage.getHealthMetrics(demoUser!.id, 50);
+      const metrics = await storage.getHealthMetrics(demoUser!.id, 90);
       res.json(metrics);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch health metrics" });

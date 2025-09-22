@@ -27,9 +27,14 @@ export function MoodPage() {
 
   // Mutation for analyzing mood with auto-play
   const analyzeMoodMutation = useMutation({
-    mutationFn: () => autoPlayEnabled ? 
-      autoMusicService.analyzeAndPlay() : 
-      apiRequest('/api/mood/analyze', 'POST'),
+    mutationFn: async () => {
+      if (autoPlayEnabled) {
+        return autoMusicService.analyzeAndPlay();
+      } else {
+        const response = await apiRequest('POST', '/api/mood/analyze');
+        return await response.json();
+      }
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/mood/analysis'] });
       queryClient.invalidateQueries({ queryKey: ['/api/music/recommendations'] });
@@ -58,7 +63,7 @@ export function MoodPage() {
     const handleAutoPlay = (event: any) => {
       setCurrentAutoTrack(event.detail.track);
       toast({
-        title: "🎵 Auto-Playing Music",
+        title: "Auto-Playing Music",
         description: `${event.detail.track.trackName} - ${event.detail.track.moodMatch}% mood match`,
       });
     };

@@ -25,7 +25,10 @@ export function MusicPage() {
 
   // Mutation for generating new recommendations
   const generateRecommendationsMutation = useMutation({
-    mutationFn: () => apiRequest('/api/music/recommendations', 'POST'),
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/music/recommendations');
+      return await response.json();
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/music/recommendations'] });
       toast({
