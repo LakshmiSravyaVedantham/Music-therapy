@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button"
-import { Play, Heart, Music } from "lucide-react"
+import { Play, Heart, Music, Activity } from "lucide-react"
+import { useLocation } from "wouter"
 import heroImage from "@assets/generated_images/Health_waves_transforming_to_music_c48d45db.png"
 
 export function HeroSection() {
+  const [, setLocation] = useLocation();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Hero Background Image */}
@@ -36,7 +38,7 @@ export function HeroSection() {
             variant="outline" 
             className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-3"
             data-testid="button-get-started"
-            onClick={() => console.log('Get Started clicked')}
+            onClick={() => setLocation('/mood')}
           >
             <Play className="mr-2 h-5 w-5" />
             Get Started
@@ -47,8 +49,9 @@ export function HeroSection() {
             variant="outline" 
             className="bg-transparent border-white/40 text-white hover:bg-white/10 backdrop-blur-sm px-8 py-3"
             data-testid="button-learn-more"
-            onClick={() => console.log('Learn More clicked')}
+            onClick={() => setLocation('/health')}
           >
+            <Activity className="mr-2 h-5 w-5" />
             Learn More
           </Button>
         </div>
