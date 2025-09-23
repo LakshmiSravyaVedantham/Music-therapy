@@ -2,16 +2,40 @@ import { MusicRecommendationCard } from "@/components/MusicRecommendationCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { autoMusicService } from "@/services/autoMusicService";
 
 export function MusicPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Sync with autoMusicService state
+  useEffect(() => {
+    const updateState = () => {
+      setIsPlaying(autoMusicService.getIsPlaying());
+      setCurrentTrack(autoMusicService.getCurrentTrack());
+    };
+    
+    // Initial sync
+    updateState();
+    
+    // Listen for auto-play events
+    const handleAutoPlay = () => updateState();
+    window.addEventListener('autoMusicPlay', handleAutoPlay);
+    
+    // Periodic sync to catch any state changes
+    const interval = setInterval(updateState, 1000);
+    
+    return () => {
+      window.removeEventListener('autoMusicPlay', handleAutoPlay);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Fetch music recommendations
   const { data: recommendations, isLoading } = useQuery({
@@ -49,17 +73,33 @@ export function MusicPage() {
     generateRecommendationsMutation.mutate();
   };
 
-  const handlePlayTrack = (track: any) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    toast({
-      title: "Now Playing",
-      description: `${track.trackName} by ${track.artistName}`,
-    });
+  const handlePlayTrack = async (track: any) => {
+    try {
+      if (!track.previewUrl) {
+        toast({
+          title: "Preview Not Available",
+          description: "This track doesn't have a preview available for playback.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      await autoMusicService.playTrack(track);
+      toast({
+        title: "Now Playing",
+        description: `${track.trackName} by ${track.artistName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Playback Failed",
+        description: "Unable to start playback. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePauseResume = () => {
-    setIsPlaying(!isPlaying);
+    autoMusicService.pauseResume();
   };
 
   if (isLoading) {
@@ -96,7 +136,7 @@ export function MusicPage() {
       </div>
 
       {/* Current Mood Context */}
-      {latestMoodAnalysis && (
+      {latestMoodAnalysis && latestMoodAnalysis.analysis && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -109,19 +149,19 @@ export function MusicPage() {
           <CardContent>
             <div className="flex items-center gap-4">
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                latestMoodAnalysis.mood === 'energetic' || latestMoodAnalysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                latestMoodAnalysis.mood === 'calm' || latestMoodAnalysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                latestMoodAnalysis.mood === 'stressed' || latestMoodAnalysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                latestMoodAnalysis.analysis.mood === 'energetic' || latestMoodAnalysis.analysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                latestMoodAnalysis.analysis.mood === 'calm' || latestMoodAnalysis.analysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                latestMoodAnalysis.analysis.mood === 'stressed' || latestMoodAnalysis.analysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
               }`}>
-                Current Mood: {latestMoodAnalysis.mood}
+                Current Mood: {latestMoodAnalysis.analysis.mood}
               </div>
               <div className="text-sm text-muted-foreground">
-                {latestMoodAnalysis.confidence}% confidence
+                {latestMoodAnalysis.analysis.confidence}% confidence
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              {latestMoodAnalysis.description}
+              {latestMoodAnalysis.analysis.description}
             </p>
           </CardContent>
         </Card>
@@ -188,7 +228,7 @@ export function MusicPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {recommendations && recommendations.length > 0 ? (
+          {recommendations && Array.isArray(recommendations) && recommendations.length > 0 ? (
             <div className="space-y-4">
               {recommendations.map((recommendation: any, index: number) => (
                 <div key={recommendation.id} className="flex items-center gap-4 p-4 rounded-lg border hover-elevate">

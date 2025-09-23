@@ -90,23 +90,53 @@ export class AutoMusicService {
 
       this.currentTrack = track;
       
-      // For demo purposes, we'll simulate audio playback
-      // In a real app, this would use Spotify Web Playback SDK
       console.log(`Now playing: ${track.trackName} by ${track.artistName}`);
       console.log(`Mood match: ${track.moodMatch}%`);
       
-      this.isPlaying = true;
-      
-      // Simulate track duration
-      setTimeout(() => {
-        if (this.isPlaying && this.currentTrack?.id === track.id) {
+      // Check if track has a preview URL for actual audio playback
+      if (track.previewUrl) {
+        this.audio = new Audio(track.previewUrl);
+        this.audio.volume = this.config.volume;
+        
+        // Set up audio event listeners
+        this.audio.onended = () => {
           console.log('Track ended, auto-analyzing for next recommendation...');
-          this.analyzeAndPlay();
-        }
-      }, 30000); // 30 seconds for demo
+          this.isPlaying = false;
+          this.currentTrack = null;
+          if (this.config.enabled) {
+            this.analyzeAndPlay();
+          }
+        };
+        
+        this.audio.onerror = (error) => {
+          console.error('Audio playback error:', error);
+          this.isPlaying = false;
+        };
+        
+        // Start playback
+        await this.audio.play();
+        this.isPlaying = true;
+      } else {
+        // Fallback for tracks without preview URLs
+        console.warn('No preview URL available for this track');
+        this.isPlaying = true;
+        
+        // Simulate track duration for tracks without preview
+        setTimeout(() => {
+          if (this.isPlaying && this.currentTrack?.id === track.id) {
+            console.log('Simulated track ended, auto-analyzing for next recommendation...');
+            this.isPlaying = false;
+            this.currentTrack = null;
+            if (this.config.enabled) {
+              this.analyzeAndPlay();
+            }
+          }
+        }, 30000); // 30 seconds for demo
+      }
 
     } catch (error) {
       console.error('Error playing track:', error);
+      this.isPlaying = false;
     }
   }
 
