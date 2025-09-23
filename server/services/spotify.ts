@@ -245,11 +245,20 @@ function getUserPreferredGenres(
     "brazil", "breakbeat", "british", "chill", "classical", "club", "country", "dance",
     "dancehall", "deep-house", "disco", "drum-and-bass", "dub", "dubstep", "electronic",
     "folk", "funk", "garage", "gospel", "groove", "hip-hop", "house", "indie", "jazz",
-    "latin", "lo-fi", "new-age", "pop", "r-n-b", "reggae", "rock", "soul", "techno", "trance",
-    "world-music", "indian", "meditation"
+    "latin", "lo-fi", "new-age", "pop", "r-n-b", "reggae", "rock", "soul", "techno", "trance"
   ];
   
-  return Array.from(new Set(genres))
+  // Map non-standard genres to valid Spotify genres for API compatibility
+  const genreMapping: Record<string, string> = {
+    "world-music": "ambient",
+    "indian": "new-age",
+    "meditation": "ambient"
+  };
+  
+  // Convert mapped genres
+  const mappedGenres = genres.map(genre => genreMapping[genre] || genre);
+  
+  return Array.from(new Set(mappedGenres))
     .filter(genre => validSpotifyGenres.includes(genre.toLowerCase()))
     .slice(0, 5);
 }
@@ -376,6 +385,8 @@ function selectTracksByMood(tracks: any[], mood: string): any[] {
       return [tracks[1], tracks[3], tracks[0], tracks[2]]; // Upbeat first
     case "focused":
       return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Carnatic music first for focus and meditation
+    case "stressed":
+      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Prioritize Carnatic healing music for stress relief
     default:
       return tracks;
   }
