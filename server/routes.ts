@@ -14,12 +14,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       username: "demo_user",
       email: "demo@healthtune.app",
       preferences: {
-        musicGenres: ["pop", "electronic", "indie"],
-        healthGoals: ["improve_sleep", "increase_activity", "reduce_stress"],
+        musicGenres: ["meditation", "indian", "new-age", "world-music", "spiritual", "ambient"],
+        healthGoals: ["improve_sleep", "increase_activity", "reduce_stress", "spiritual_wellness", "chakra_balance"],
         moodPreferences: {
-          energetic: ["electronic", "pop", "dance"],
-          calm: ["ambient", "classical", "acoustic"],
-          focused: ["lo-fi", "instrumental", "classical"]
+          energetic: ["devotional", "spiritual", "world-music", "indian", "new-age"],
+          calm: ["meditation", "flute", "ambient", "indian", "new-age", "spiritual"],
+          focused: ["meditation", "indian", "instrumental", "new-age", "ambient", "world-music"],
+          stressed: ["meditation", "healing", "indian", "ambient", "spiritual", "new-age"],
+          melancholy: ["spiritual", "meditation", "new-age", "indian", "healing", "ambient"],
+          relaxed: ["meditation", "new-age", "indian", "ambient", "spiritual", "world-music"]
         }
       }
     });

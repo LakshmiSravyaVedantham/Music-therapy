@@ -39,7 +39,7 @@ Previous mood preferences: ${Object.entries(userPreferences.moodPreferences).map
     `${mood}: ${genres.join(', ')}`).join('; ')}
   ` : '';
 
-  const prompt = `You are an expert health and mood analysis AI. Analyze the following health data to determine the person's current mood and provide music therapy recommendations.
+  const prompt = `You are an expert health and mood analysis AI specializing in music therapy with focus on spirituality, meditation, and healing through sound. Analyze the following health data to determine the person's current mood and provide therapeutic music recommendations emphasizing Indian classical music, meditation, and spiritual wellness.
 
 Current Health Metrics:
 ${healthSummary}
@@ -60,16 +60,27 @@ Based on this health data, provide a JSON response with the following structure:
   }
 }
 
-Guidelines:
+Guidelines for Health Analysis:
 - Heart rate patterns: 60-100 bpm normal, >100 may indicate stress/energy, <60 may indicate calm/rest
 - Sleep quality affects mood significantly
 - Steps/activity level correlates with energy
 - Consider time of day and patterns
-- Factor in user's music preferences when recommending genres
 - Confidence should reflect how clearly the data indicates the mood (60-95%)
 - Factors should be specific health metrics that influenced the analysis
 - Description should be empathetic and actionable (2-3 sentences)
-- Music recommendations should match the detected mood and user preferences
+
+CRITICAL: Music Therapy Guidelines - Prioritize Spirituality & Meditation:
+- ALWAYS prioritize spiritual and meditative music genres in recommendations
+- For ALL moods, include Indian classical music elements: Carnatic, Hindustani, ragas
+- Emphasize therapeutic instruments: flute (bansuri), veena, sitar, tabla, tanpura
+- Prioritize meditation-oriented genres: ambient meditation, new-age spiritual, mantra chanting
+- For stressed/anxious moods: Focus heavily on Carnatic ragas known for healing (Raga Darbari, Raga Bageshri)
+- For calm/relaxed moods: Emphasize flute meditation, veena compositions, ambient spiritual
+- For focused moods: Traditional instrumental ragas, bamboo flute, meditation bowls
+- For energetic moods: Still include spiritual uplifting music like devotional bhajans or kirtan
+- Always consider music as medicine for the soul and chakra balancing
+- Prefer traditional over contemporary when possible
+- Include world music with spiritual elements from various traditions
 
 Respond only with valid JSON, no additional text.`;
 
@@ -174,15 +185,15 @@ function createFallbackMoodAnalysis(healthMetrics: Record<string, HealthMetric>)
 
 function getMusicGenresForMood(mood: string): string[] {
   const genreMap: Record<string, string[]> = {
-    energetic: ["pop", "electronic", "rock", "dance"],
-    calm: ["ambient", "classical", "acoustic", "jazz", "world-music", "indian", "new-age"],
-    focused: ["instrumental", "lo-fi", "classical", "ambient", "world-music", "indian", "new-age"],
-    melancholy: ["indie", "alternative", "acoustic", "folk"],
-    stressed: ["ambient", "classical", "meditation", "world-music", "indian", "new-age"],
-    relaxed: ["jazz", "acoustic", "indie", "chill-out", "world-music", "new-age"]
+    energetic: ["world-music", "indian", "new-age", "spiritual", "devotional", "pop", "electronic"],
+    calm: ["meditation", "ambient", "new-age", "indian", "world-music", "classical", "spiritual", "flute"],
+    focused: ["meditation", "indian", "new-age", "instrumental", "ambient", "world-music", "classical", "spiritual"],
+    melancholy: ["meditation", "new-age", "indian", "world-music", "ambient", "acoustic", "spiritual"],
+    stressed: ["meditation", "indian", "new-age", "ambient", "world-music", "classical", "spiritual", "healing"],
+    relaxed: ["meditation", "new-age", "indian", "world-music", "ambient", "jazz", "spiritual", "classical"]
   };
   
-  return genreMap[mood] || ["pop", "acoustic"];
+  return genreMap[mood] || ["meditation", "new-age", "indian", "world-music"];
 }
 
 function formatTimeAgo(timestamp: Date): string {

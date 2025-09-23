@@ -320,28 +320,29 @@ moodAnalysis.mood === 'stressed' || moodAnalysis.mood === 'anxious' ? 'bg-red-10
           {recommendationsArray.length > 0 ? (
             <div className="space-y-4">
               {recommendationsArray.map((recommendation: any, index: number) => (
-                <div key={recommendation.id} className="flex items-center gap-4 p-4 rounded-lg border hover-elevate">
+                <div key={recommendation.id} className="flex items-start gap-4 p-4 rounded-lg border hover-elevate">
                   <Button 
                     size="icon" 
                     variant="outline"
                     onClick={() => handlePlayTrack(recommendation)}
                     data-testid={`button-play-${recommendation.id}`}
+                    className="mt-1"
                   >
                     <Play className="h-4 w-4" />
                   </Button>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium truncate">{recommendation.trackName}</h3>
-                    <p className="text-sm text-muted-foreground truncate">{recommendation.artistName}</p>
-                    <p className="text-xs text-muted-foreground truncate">{recommendation.albumName}</p>
+                    <h3 className="font-medium">{recommendation.trackName}</h3>
+                    <p className="text-sm text-muted-foreground">{recommendation.artistName}</p>
+                    <p className="text-xs text-muted-foreground">{recommendation.albumName}</p>
                   </div>
                   
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-chart-1">
+                  <div className="text-right min-w-0 max-w-sm">
+                    <div className="text-sm font-medium text-chart-1 mb-1">
                       {recommendation.moodMatch}% match
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {recommendation.reason?.substring(0, 30)}...
+                    <div className="text-xs text-muted-foreground leading-relaxed">
+                      {recommendation.reason}
                     </div>
                   </div>
                 </div>

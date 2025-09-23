@@ -318,25 +318,25 @@ function formatDuration(durationMs: number): string {
 }
 
 function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: number): TrackRecommendation[] {
-  // Fallback data when Spotify is unavailable - using sample audio URLs
+  // Enhanced fallback data with spiritual and meditation-oriented music
   const fallbackTracks = [
     {
       id: "fallback-1",
-      name: "Peaceful Piano",
-      artist: "Various Artists",
-      album: "Relaxation Music",
-      duration: "3:45",
-      reason: "Calming instrumental for relaxation",
-      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" // Sample calm sound
+      name: "Bansuri Flute Meditation",
+      artist: "Pandit Hariprasad Chaurasia",
+      album: "Sacred Flute Meditations",
+      duration: "7:35",
+      reason: "Therapeutic bamboo flute for deep meditation and chakra balancing",
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
     },
     {
       id: "fallback-2", 
-      name: "Upbeat Energy",
-      artist: "Various Artists",
-      album: "Workout Mix",
-      duration: "4:12",
-      reason: "High energy for motivation",
-      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-6s.mp3" // Sample energetic sound
+      name: "Veena Raga Bhairav",
+      artist: "S. Balachander",
+      album: "Classical Veena Ragas",
+      duration: "9:12",
+      reason: "Morning raga on veena for spiritual awakening and focus",
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-6s.mp3"
     },
     {
       id: "fallback-3",
@@ -345,16 +345,70 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
       album: "Therapeutic Ragas",
       duration: "6:15",
       reason: "Traditional Carnatic music for deep meditation and healing",
-      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" // Sample ambient sound
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
     },
     {
       id: "fallback-4",
       name: "Raga Yaman - Peaceful",
-      artist: "Classical Indian Ensemble",
+      artist: "Classical Indian Ensemble", 
       album: "Healing Ragas",
       duration: "8:20",
       reason: "Soothing Carnatic composition for stress relief and focus",
-      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3" // Sample electronic sound
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3"
+    },
+    {
+      id: "fallback-5",
+      name: "Sitar Meditation - Raga Darbari",
+      artist: "Pandit Ravi Shankar",
+      album: "Healing Ragas Collection",
+      duration: "11:45",
+      reason: "Deep healing raga on sitar for stress relief and inner peace",
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
+    },
+    {
+      id: "fallback-6",
+      name: "Tanpura Drone - Om Meditation",
+      artist: "Spiritual Sound Healers",
+      album: "Sacred Drone Meditations",
+      duration: "15:00",
+      reason: "Continuous tanpura drone with Om chanting for deep meditation",
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3"
+    },
+    {
+      id: "fallback-7",
+      name: "Tabla & Flute Devotional",
+      artist: "Bhajan Ensemble",
+      album: "Spiritual Rhythms",
+      duration: "5:30",
+      reason: "Uplifting devotional music with tabla rhythms and flute melodies",
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
+    },
+    {
+      id: "fallback-8",
+      name: "Tibetan Singing Bowls & Flute",
+      artist: "Meditation Masters",
+      album: "Chakra Healing Sounds",
+      duration: "12:20",
+      reason: "Healing vibrations from Tibetan bowls combined with flute meditation",
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-6s.mp3"
+    },
+    {
+      id: "fallback-9",
+      name: "Gayatri Mantra - Traditional",
+      artist: "Sanskrit Chanting Collective",
+      album: "Sacred Mantras for Healing",
+      duration: "8:00",
+      reason: "Sacred Gayatri mantra chanting for spiritual purification and peace",
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
+    },
+    {
+      id: "fallback-10",
+      name: "Santoor Mountain Meditation",
+      artist: "Pandit Shivkumar Sharma",
+      album: "Himalayan Sounds",
+      duration: "10:15",
+      reason: "Ethereal santoor melodies inspired by Himalayan spirituality",
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3"
     }
   ];
   
@@ -375,20 +429,28 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
 }
 
 function selectTracksByMood(tracks: any[], mood: string): any[] {
-  // Return tracks in order based on mood
+  // Return tracks in order based on mood, prioritizing spiritual and meditative content
   switch (mood) {
     case "calm":
     case "relaxed":
-      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Carnatic music first for meditation
+      // Prioritize flute, tanpura, and healing instruments for calmness
+      return [tracks[0], tracks[5], tracks[7], tracks[2], tracks[3], tracks[9], tracks[1], tracks[6], tracks[8], tracks[4]];
     case "energetic":
     case "happy":
-      return [tracks[1], tracks[3], tracks[0], tracks[2]]; // Upbeat first
+      // Include uplifting devotional and rhythmic spiritual music
+      return [tracks[6], tracks[1], tracks[8], tracks[0], tracks[3], tracks[7], tracks[2], tracks[4], tracks[5], tracks[9]];
     case "focused":
-      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Carnatic music first for focus and meditation
+      // Emphasize instrumental ragas and meditation sounds for concentration
+      return [tracks[1], tracks[4], tracks[0], tracks[9], tracks[2], tracks[3], tracks[5], tracks[7], tracks[8], tracks[6]];
     case "stressed":
-      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Prioritize Carnatic healing music for stress relief
+      // Prioritize healing ragas and calming instruments for stress relief
+      return [tracks[4], tracks[5], tracks[0], tracks[2], tracks[7], tracks[8], tracks[3], tracks[9], tracks[1], tracks[6]];
+    case "melancholy":
+      // Use healing and uplifting spiritual music
+      return [tracks[8], tracks[5], tracks[0], tracks[2], tracks[9], tracks[7], tracks[3], tracks[4], tracks[1], tracks[6]];
     default:
-      return tracks;
+      // Default spiritual order
+      return [tracks[0], tracks[2], tracks[1], tracks[4], tracks[5], tracks[7], tracks[8], tracks[9], tracks[3], tracks[6]];
   }
 }
 
