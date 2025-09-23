@@ -113,6 +113,14 @@ export class AutoMusicService {
           this.isPlaying = false;
         };
         
+        this.audio.onloadedmetadata = () => {
+          // Audio metadata loaded, duration is now available
+        };
+        
+        this.audio.ontimeupdate = () => {
+          // Time update events for progress tracking
+        };
+        
         // Start playback
         await this.audio.play();
         this.isPlaying = true;
@@ -159,6 +167,36 @@ export class AutoMusicService {
         this.isPlaying = true;
       }
     }
+  }
+  
+  seek(time: number): void {
+    if (this.audio && !isNaN(time)) {
+      this.audio.currentTime = Math.max(0, Math.min(time, this.audio.duration || 0));
+    }
+  }
+  
+  setVolume(volume: number): void {
+    this.config.volume = Math.max(0, Math.min(1, volume));
+    if (this.audio) {
+      this.audio.volume = this.config.volume;
+    }
+    this.saveConfig();
+  }
+  
+  getAudioElement(): HTMLAudioElement | null {
+    return this.audio;
+  }
+  
+  getCurrentTime(): number {
+    return this.audio ? this.audio.currentTime : 0;
+  }
+  
+  getDuration(): number {
+    return this.audio ? this.audio.duration || 0 : 0;
+  }
+  
+  getVolume(): number {
+    return this.config.volume;
   }
 
   getCurrentTrack() {

@@ -1,6 +1,7 @@
 import { MusicRecommendationCard } from "@/components/MusicRecommendationCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +12,10 @@ import { autoMusicService } from "@/services/autoMusicService";
 export function MusicPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(50);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -19,6 +24,14 @@ export function MusicPage() {
     const updateState = () => {
       setIsPlaying(autoMusicService.getIsPlaying());
       setCurrentTrack(autoMusicService.getCurrentTrack());
+      
+      // Update audio progress and duration
+      const audio = autoMusicService.getAudioElement();
+      if (audio) {
+        setCurrentTime(audio.currentTime);
+        setDuration(audio.duration || 0);
+        setVolume(Math.round(audio.volume * 100));
+      }
     };
     
     // Initial sync
@@ -28,8 +41,8 @@ export function MusicPage() {
     const handleAutoPlay = () => updateState();
     window.addEventListener('autoMusicPlay', handleAutoPlay);
     
-    // Periodic sync to catch any state changes
-    const interval = setInterval(updateState, 1000);
+    // Periodic sync to catch any state changes including audio progress
+    const interval = setInterval(updateState, 500);
     
     return () => {
       window.removeEventListener('autoMusicPlay', handleAutoPlay);
@@ -46,6 +59,12 @@ export function MusicPage() {
   const { data: latestMoodAnalysis } = useQuery({
     queryKey: ['/api/mood/analysis/latest'],
   });
+  
+  // Type-safe recommendations array
+  const recommendationsArray = Array.isArray(recommendations) ? recommendations : [];
+  
+  // Type-safe mood analysis
+  const moodAnalysis = latestMoodAnalysis && typeof latestMoodAnalysis === 'object' ? latestMoodAnalysis as any : null;
 
   // Mutation for generating new recommendations
   const generateRecommendationsMutation = useMutation({
@@ -85,6 +104,15 @@ export function MusicPage() {
       }
       
       await autoMusicService.playTrack(track);
+      
+      // Update current track index
+      if (recommendationsArray.length > 0) {
+        const trackIndex = recommendationsArray.findIndex((r: any) => r.id === track.id);
+        if (trackIndex !== -1) {
+          setCurrentTrackIndex(trackIndex);
+        }
+      }
+      
       toast({
         title: "Now Playing",
         description: `${track.trackName} by ${track.artistName}`,
@@ -100,6 +128,41 @@ export function MusicPage() {
 
   const handlePauseResume = () => {
     autoMusicService.pauseResume();
+  };
+  
+  const handleNextTrack = () => {
+    if (recommendationsArray.length > 0) {
+      const nextIndex = (currentTrackIndex + 1) % recommendationsArray.length;
+      setCurrentTrackIndex(nextIndex);
+      handlePlayTrack(recommendationsArray[nextIndex]);
+    }
+  };
+  
+  const handlePreviousTrack = () => {
+    if (recommendationsArray.length > 0) {
+      const prevIndex = currentTrackIndex === 0 ? recommendationsArray.length - 1 : currentTrackIndex - 1;
+      setCurrentTrackIndex(prevIndex);
+      handlePlayTrack(recommendationsArray[prevIndex]);
+    }
+  };
+  
+  const handleSeek = (newTime: number[]) => {
+    const seekTime = newTime[0];
+    autoMusicService.seek(seekTime);
+    setCurrentTime(seekTime);
+  };
+  
+  const handleVolumeChange = (newVolume: number[]) => {
+    const volumeValue = newVolume[0];
+    setVolume(volumeValue);
+    autoMusicService.setVolume(volumeValue / 100);
+  };
+  
+  const formatTime = (seconds: number): string => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (isLoading) {
@@ -136,7 +199,7 @@ export function MusicPage() {
       </div>
 
       {/* Current Mood Context */}
-      {latestMoodAnalysis && (
+      {moodAnalysis && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -149,19 +212,19 @@ export function MusicPage() {
           <CardContent>
             <div className="flex items-center gap-4">
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                latestMoodAnalysis.mood === 'energetic' || latestMoodAnalysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                latestMoodAnalysis.mood === 'calm' || latestMoodAnalysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                latestMoodAnalysis.mood === 'stressed' || latestMoodAnalysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+moodAnalysis.mood === 'energetic' || moodAnalysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+moodAnalysis.mood === 'calm' || moodAnalysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+moodAnalysis.mood === 'stressed' || moodAnalysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
               }`}>
-                Current Mood: {latestMoodAnalysis.mood}
+                Current Mood: {moodAnalysis.mood}
               </div>
               <div className="text-sm text-muted-foreground">
-                {latestMoodAnalysis.confidence}% confidence
+                {moodAnalysis.confidence}% confidence
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              {latestMoodAnalysis.description}
+              {moodAnalysis.description}
             </p>
           </CardContent>
         </Card>
@@ -188,28 +251,54 @@ export function MusicPage() {
               
               {/* Player Controls */}
               <div className="flex items-center justify-center gap-4">
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={handlePreviousTrack}
+                  disabled={recommendationsArray.length === 0}
+                  data-testid="button-previous-track"
+                >
                   <SkipBack className="h-4 w-4" />
                 </Button>
-                <Button size="icon" onClick={handlePauseResume}>
+                <Button size="icon" onClick={handlePauseResume} data-testid="button-play-pause">
                   {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                 </Button>
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={handleNextTrack}
+                  disabled={recommendationsArray.length === 0}
+                  data-testid="button-next-track"
+                >
                   <SkipForward className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="icon">
-                  <Volume2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+                  <Slider
+                    value={[volume]}
+                    onValueChange={handleVolumeChange}
+                    max={100}
+                    step={1}
+                    className="w-20"
+                    data-testid="slider-volume"
+                  />
+                </div>
               </div>
               
               {/* Progress Bar */}
               <div className="space-y-2">
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: '45%' }}></div>
-                </div>
+                <Slider
+                  value={[currentTime]}
+                  onValueChange={handleSeek}
+                  max={duration || 100}
+                  step={0.1}
+                  className="w-full"
+                  disabled={!currentTrack || duration === 0}
+                  data-testid="slider-progress"
+                />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>1:23</span>
-                  <span>3:45</span>
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
                 </div>
               </div>
             </div>
@@ -228,9 +317,9 @@ export function MusicPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {recommendations && Array.isArray(recommendations) && recommendations.length > 0 ? (
+          {recommendationsArray.length > 0 ? (
             <div className="space-y-4">
-              {recommendations.map((recommendation: any, index: number) => (
+              {recommendationsArray.map((recommendation: any, index: number) => (
                 <div key={recommendation.id} className="flex items-center gap-4 p-4 rounded-lg border hover-elevate">
                   <Button 
                     size="icon" 
