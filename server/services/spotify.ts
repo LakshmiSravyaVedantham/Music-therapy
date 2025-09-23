@@ -317,7 +317,7 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
       album: "Relaxation Music",
       duration: "3:45",
       reason: "Calming instrumental for relaxation",
-      previewUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" // Sample calm sound
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" // Sample calm sound
     },
     {
       id: "fallback-2", 
@@ -326,7 +326,7 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
       album: "Workout Mix",
       duration: "4:12",
       reason: "High energy for motivation",
-      previewUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" // Sample energetic sound
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-6s.mp3" // Sample energetic sound
     },
     {
       id: "fallback-3",
@@ -335,7 +335,7 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
       album: "Mindfulness Collection",
       duration: "5:30",
       reason: "Peaceful ambient for focus",
-      previewUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" // Sample ambient sound
+      previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" // Sample ambient sound
     },
     {
       id: "fallback-4",
@@ -344,7 +344,7 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
       album: "Study Beats",
       duration: "4:18",
       reason: "Electronic beats for concentration",
-      previewUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" // Sample electronic sound
+      previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3" // Sample electronic sound
     }
   ];
   

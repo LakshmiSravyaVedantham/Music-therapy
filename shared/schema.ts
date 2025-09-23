@@ -50,6 +50,7 @@ export const musicRecommendations = pgTable("music_recommendations", {
   trackName: text("track_name").notNull(),
   artistName: text("artist_name").notNull(),
   albumName: text("album_name").notNull(),
+  previewUrl: text("preview_url"), // Audio preview URL for playback
   moodMatch: real("mood_match").notNull(), // 0-100
   reason: text("reason").notNull(),
   audioFeatures: jsonb("audio_features").$type<{

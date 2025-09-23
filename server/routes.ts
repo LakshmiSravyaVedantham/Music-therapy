@@ -168,6 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             trackName: track.name,
             artistName: track.artist,
             albumName: track.album,
+            previewUrl: track.previewUrl || null, // Include preview URL for audio playback
             moodMatch: track.moodMatch,
             reason: track.reason,
             audioFeatures: track.audioFeatures
