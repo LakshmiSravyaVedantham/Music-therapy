@@ -104,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         confidence: moodResult.confidence,
         factors: moodResult.factors,
         description: moodResult.description,
-        healthDataSnapshot: healthMetrics
+        healthDataSnapshot: healthMetrics as Record<string, any>
       });
 
       res.json({

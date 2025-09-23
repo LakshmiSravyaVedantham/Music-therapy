@@ -136,7 +136,7 @@ export function MusicPage() {
       </div>
 
       {/* Current Mood Context */}
-      {latestMoodAnalysis && latestMoodAnalysis.analysis && (
+      {latestMoodAnalysis && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -149,19 +149,19 @@ export function MusicPage() {
           <CardContent>
             <div className="flex items-center gap-4">
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                latestMoodAnalysis.analysis.mood === 'energetic' || latestMoodAnalysis.analysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                latestMoodAnalysis.analysis.mood === 'calm' || latestMoodAnalysis.analysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                latestMoodAnalysis.analysis.mood === 'stressed' || latestMoodAnalysis.analysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                latestMoodAnalysis.mood === 'energetic' || latestMoodAnalysis.mood === 'happy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                latestMoodAnalysis.mood === 'calm' || latestMoodAnalysis.mood === 'focused' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                latestMoodAnalysis.mood === 'stressed' || latestMoodAnalysis.mood === 'anxious' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
                 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
               }`}>
-                Current Mood: {latestMoodAnalysis.analysis.mood}
+                Current Mood: {latestMoodAnalysis.mood}
               </div>
               <div className="text-sm text-muted-foreground">
-                {latestMoodAnalysis.analysis.confidence}% confidence
+                {latestMoodAnalysis.confidence}% confidence
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              {latestMoodAnalysis.analysis.description}
+              {latestMoodAnalysis.description}
             </p>
           </CardContent>
         </Card>

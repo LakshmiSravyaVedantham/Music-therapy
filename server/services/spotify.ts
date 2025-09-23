@@ -245,7 +245,8 @@ function getUserPreferredGenres(
     "brazil", "breakbeat", "british", "chill", "classical", "club", "country", "dance",
     "dancehall", "deep-house", "disco", "drum-and-bass", "dub", "dubstep", "electronic",
     "folk", "funk", "garage", "gospel", "groove", "hip-hop", "house", "indie", "jazz",
-    "latin", "lo-fi", "new-age", "pop", "r-n-b", "reggae", "rock", "soul", "techno", "trance"
+    "latin", "lo-fi", "new-age", "pop", "r-n-b", "reggae", "rock", "soul", "techno", "trance",
+    "world-music", "indian", "meditation"
   ];
   
   return Array.from(new Set(genres))
@@ -330,20 +331,20 @@ function getFallbackRecommendations(moodAnalysis: MoodAnalysisResult, limit: num
     },
     {
       id: "fallback-3",
-      name: "Ambient Meditation",
-      artist: "Various Artists",
-      album: "Mindfulness Collection",
-      duration: "5:30",
-      reason: "Peaceful ambient for focus",
+      name: "Carnatic Raga Meditation",
+      artist: "Indian Classical Artists",
+      album: "Therapeutic Ragas",
+      duration: "6:15",
+      reason: "Traditional Carnatic music for deep meditation and healing",
       previewUrl: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" // Sample ambient sound
     },
     {
       id: "fallback-4",
-      name: "Electronic Focus",
-      artist: "Various Artists",
-      album: "Study Beats",
-      duration: "4:18",
-      reason: "Electronic beats for concentration",
+      name: "Raga Yaman - Peaceful",
+      artist: "Classical Indian Ensemble",
+      album: "Healing Ragas",
+      duration: "8:20",
+      reason: "Soothing Carnatic composition for stress relief and focus",
       previewUrl: "https://samplelib.com/lib/preview/mp3/sample-15s.mp3" // Sample electronic sound
     }
   ];
@@ -369,12 +370,12 @@ function selectTracksByMood(tracks: any[], mood: string): any[] {
   switch (mood) {
     case "calm":
     case "relaxed":
-      return [tracks[0], tracks[2], tracks[1], tracks[3]]; // Peaceful first
+      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Carnatic music first for meditation
     case "energetic":
     case "happy":
       return [tracks[1], tracks[3], tracks[0], tracks[2]]; // Upbeat first
     case "focused":
-      return [tracks[3], tracks[2], tracks[0], tracks[1]]; // Focus tracks first
+      return [tracks[2], tracks[3], tracks[0], tracks[1]]; // Carnatic music first for focus and meditation
     default:
       return tracks;
   }

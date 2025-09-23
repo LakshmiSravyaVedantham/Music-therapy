@@ -175,11 +175,11 @@ function createFallbackMoodAnalysis(healthMetrics: Record<string, HealthMetric>)
 function getMusicGenresForMood(mood: string): string[] {
   const genreMap: Record<string, string[]> = {
     energetic: ["pop", "electronic", "rock", "dance"],
-    calm: ["ambient", "classical", "acoustic", "jazz"],
-    focused: ["instrumental", "lo-fi", "classical", "ambient"],
+    calm: ["ambient", "classical", "acoustic", "jazz", "world-music", "indian", "new-age"],
+    focused: ["instrumental", "lo-fi", "classical", "ambient", "world-music", "indian", "new-age"],
     melancholy: ["indie", "alternative", "acoustic", "folk"],
-    stressed: ["ambient", "classical", "nature sounds", "meditation"],
-    relaxed: ["jazz", "acoustic", "indie", "chill-out"]
+    stressed: ["ambient", "classical", "meditation", "world-music", "indian", "new-age"],
+    relaxed: ["jazz", "acoustic", "indie", "chill-out", "world-music", "new-age"]
   };
   
   return genreMap[mood] || ["pop", "acoustic"];
